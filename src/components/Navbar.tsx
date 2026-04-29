@@ -184,8 +184,14 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile: spacer for centered logo (mirrors hamburger width) */}
-          <div className="w-9 md:hidden" />
+          {/* Mobile: Emergency button — always visible on right side */}
+          <button
+            className="rounded-xl p-2 bg-red-600 hover:bg-red-700 text-white md:hidden transition-all duration-200 shadow-sm"
+            onClick={() => setEmergencyOpen(true)}
+            title="Emergency"
+          >
+            <AlertTriangle className="h-5 w-5" />
+          </button>
         </div>
       </nav>
 
