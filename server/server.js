@@ -40,6 +40,10 @@ app.use(cors({
     if (origin.match(/^http:\/\/localhost:\d+$/)) {
       return callback(null, true);
     }
+    // Allow Vercel preview/production deployments
+    if (origin.match(/\.vercel\.app$/)) {
+      return callback(null, true);
+    }
     // Check against CLIENT_URL for production
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     if (origin === clientUrl) {
@@ -123,6 +127,9 @@ const io = new Server(httpServer, {
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
       if (origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
+      if (origin.match(/\.vercel\.app$/)) return callback(null, true);
+      const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+      if (origin === clientUrl) return callback(null, true);
       callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
