@@ -6,10 +6,11 @@ import {
   Activity, LayoutDashboard, Calendar, User, LogOut,
   Stethoscope, Clock, Star, Users, ShieldCheck, CreditCard,
   Menu, X, FileText, ChevronRight, Brain, MessageCircle, MapPin, LifeBuoy,
-  Sun, Moon,
+  Sun, Moon, AlertTriangle,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import EmergencyModal from '@/components/EmergencyModal';
 
 interface NavItem {
   to: string;
@@ -45,6 +46,7 @@ export default function DashboardLayout() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [emergencyOpen, setEmergencyOpen] = useState(false);
   const userIsOnline = user?._id ? isOnline(user._id) : false;
 
   const navItems = user?.role === 'admin' ? adminNav
@@ -62,6 +64,7 @@ export default function DashboardLayout() {
     : 'bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20';
 
   return (
+    <>
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar overlay for mobile */}
       <AnimatePresence>
@@ -197,8 +200,15 @@ export default function DashboardLayout() {
           )}
         </nav>
 
-        {/* Theme Toggle + Sign Out */}
+        {/* Emergency + Theme Toggle + Sign Out */}
         <div className="border-t border-border/40 p-3 shrink-0 space-y-1">
+          <button
+            onClick={() => { setSidebarOpen(false); setEmergencyOpen(true); }}
+            className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-all duration-200 shadow-md"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            🚨 Emergency
+          </button>
           <button
             onClick={toggleTheme}
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
@@ -225,8 +235,12 @@ export default function DashboardLayout() {
           <span className="font-heading text-lg font-bold text-foreground tracking-tight">
             Medi<span className="gradient-text">AI</span>
           </span>
-          <button onClick={toggleTheme} className="text-muted-foreground hover:text-foreground transition-colors rounded-lg p-1">
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <button
+            onClick={() => setEmergencyOpen(true)}
+            className="rounded-xl p-2 bg-red-600 hover:bg-red-700 text-white transition-all duration-200 shadow-sm"
+            title="Emergency"
+          >
+            <AlertTriangle className="h-5 w-5" />
           </button>
         </div>
 
@@ -238,5 +252,9 @@ export default function DashboardLayout() {
         </div>
       </main>
     </div>
+
+    {/* Emergency Modal */}
+    <EmergencyModal open={emergencyOpen} onOpenChange={setEmergencyOpen} />
+    </>
   );
 }
