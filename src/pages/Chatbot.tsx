@@ -133,7 +133,7 @@ export default function Chatbot() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                className={`flex gap-1.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
               >
                 {/* Avatar */}
                 <div
@@ -149,21 +149,89 @@ export default function Chatbot() {
                 </div>
 
                 {/* Message bubble */}
-                <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                    msg.role === "user"
-                      ? "gradient-primary text-primary-foreground shadow-md"
-                      : "bg-muted/60 border border-border/30 text-foreground"
-                  }`}
-                >
-                  {msg.role === "assistant" ? (
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                {msg.role === "user" ? (
+                  <div className="max-w-[80%] rounded-2xl rounded-tr-none px-4 py-3 text-sm leading-relaxed gradient-primary text-primary-foreground shadow-md">
+                    {msg.content}
+                  </div>
+                ) : (
+                  <div className="max-w-[85%] rounded-2xl rounded-tl-none bg-muted/40 border border-border/30 text-foreground overflow-hidden">
+                    {/* AI label */}
+                    <div className="flex items-center gap-1.5 px-4 pt-3 pb-1">
+                      <Sparkles className="h-3 w-3 text-accent" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-accent">AI Response</span>
                     </div>
-                  ) : (
-                    msg.content
-                  )}
-                </div>
+                    {/* Markdown body */}
+                    <div className="px-4 pb-3 text-sm leading-relaxed ai-markdown">
+                      <ReactMarkdown
+                        components={{
+                          h1: ({ children }) => (
+                            <h1 className="text-lg font-bold text-foreground mt-3 mb-2 pb-1.5 border-b border-border/40">{children}</h1>
+                          ),
+                          h2: ({ children }) => (
+                            <h2 className="text-base font-bold text-foreground mt-3 mb-1.5 flex items-center gap-2">
+                              <span className="inline-block w-1 h-4 rounded-full gradient-primary" />
+                              {children}
+                            </h2>
+                          ),
+                          h3: ({ children }) => (
+                            <h3 className="text-sm font-bold text-foreground mt-2.5 mb-1">{children}</h3>
+                          ),
+                          p: ({ children }) => (
+                            <p className="mb-2 last:mb-0 text-foreground/90 leading-relaxed">{children}</p>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="mb-2 space-y-1 ml-1">{children}</ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="mb-2 space-y-1 ml-1 list-decimal list-inside">{children}</ol>
+                          ),
+                          li: ({ children }) => (
+                            <li className="flex items-start gap-2 text-foreground/90">
+                              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
+                              <span className="flex-1">{children}</span>
+                            </li>
+                          ),
+                          strong: ({ children }) => (
+                            <strong className="font-semibold text-foreground">{children}</strong>
+                          ),
+                          em: ({ children }) => (
+                            <em className="text-primary italic">{children}</em>
+                          ),
+                          code: ({ className, children, ...props }) => {
+                            const isBlock = className?.includes('language-');
+                            if (isBlock) {
+                              return (
+                                <code className="block my-2 rounded-lg bg-card border border-border/50 px-3 py-2 text-xs font-mono text-foreground overflow-x-auto">
+                                  {children}
+                                </code>
+                              );
+                            }
+                            return (
+                              <code className="rounded-md bg-primary/10 px-1.5 py-0.5 text-xs font-mono text-primary font-medium">
+                                {children}
+                              </code>
+                            );
+                          },
+                          blockquote: ({ children }) => (
+                            <blockquote className="my-2 border-l-3 border-primary/40 bg-primary/5 rounded-r-lg pl-3 pr-2 py-2 text-foreground/80 italic">
+                              {children}
+                            </blockquote>
+                          ),
+                          hr: () => (
+                            <hr className="my-3 border-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                          ),
+                          a: ({ href, children }) => (
+                            <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+                              {children}
+                            </a>
+                          ),
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ))}
           </AnimatePresence>

@@ -3,6 +3,7 @@ import { Star, Clock, BadgeCheck, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useSocket } from "@/context/SocketContext";
 
 interface Props {
   doctor: Doctor;
@@ -10,6 +11,9 @@ interface Props {
 }
 
 export default function DoctorCard({ doctor, rank }: Props) {
+  const { isOnline } = useSocket();
+  const doctorOnline = isOnline(doctor.id || (doctor as any)._id || '');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -28,10 +32,8 @@ export default function DoctorCard({ doctor, rank }: Props) {
           <div className="h-14 w-14 rounded-full gradient-primary flex items-center justify-center text-xl font-bold text-primary-foreground shadow-lg ring-2 ring-primary/20 ring-offset-2 ring-offset-card">
             {doctor.name.charAt(0)}
           </div>
-          {/* Online dot */}
-          {doctor.available && (
-            <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-card" />
-          )}
+          {/* Online dot — real-time */}
+          <div className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-card transition-colors duration-300 ${doctorOnline ? 'bg-emerald-500' : 'bg-gray-400'}`} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -50,8 +52,8 @@ export default function DoctorCard({ doctor, rank }: Props) {
               {doctor.experience} yrs
             </span>
             <span className="flex items-center gap-1">
-              <BadgeCheck className={`h-3.5 w-3.5 ${doctor.available ? 'text-emerald-500' : 'text-muted-foreground/50'}`} />
-              {doctor.available ? "Available" : "Busy"}
+              <BadgeCheck className={`h-3.5 w-3.5 ${doctorOnline ? 'text-emerald-500' : 'text-muted-foreground/50'}`} />
+              {doctorOnline ? "Online" : "Offline"}
             </span>
           </div>
 

@@ -1,6 +1,7 @@
 // Symptom Normalization Controller
 // Converts multilingual symptom input (Hindi, Hinglish, Marathi, etc.)
 // into standardized English medical symptoms using dictionary + AI fallback
+// AI fallback uses Groq API — no local Ollama dependency
 
 // ========================
 // SYMPTOM DICTIONARY (Multilingual → English)
@@ -183,12 +184,12 @@ const normalizeSymptoms = async (inputText) => {
 
   // ── Strategy 2: AI Fallback (if no dictionary match found) ──
   if (matchedSymptoms.size === 0) {
-    console.log(`  📖 No dictionary match for: "${inputText}" → using Ollama fallback`);
+    console.log(`  📖 No dictionary match for: "${inputText}" → using Groq AI fallback`);
     try {
-      const aiSymptoms = await ollamaFallback(inputText);
+      const aiSymptoms = await groqFallback(inputText);
       aiSymptoms.forEach(s => matchedSymptoms.add(s));
     } catch (err) {
-      console.error('  ❌ Ollama fallback failed:', err.message);
+      console.error('  ❌ Groq AI fallback failed:', err.message);
       // Return empty — caller should handle gracefully
     }
   }
@@ -197,31 +198,40 @@ const normalizeSymptoms = async (inputText) => {
 };
 
 /**
- * AI Fallback: Use Ollama Mistral to convert free-text to medical symptoms
+ * AI Fallback: Use Groq API (LLaMA 3.3 70B) to convert free-text to medical symptoms
  */
-const ollamaFallback = async (userInput) => {
+const groqFallback = async (userInput) => {
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  if (!GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY is not configured');
+  }
+
   const prompt = `You are a medical assistant. Convert the following sentence into standard medical symptoms in English. Return ONLY a valid JSON array of symptom strings, nothing else. Use snake_case for multi-word symptoms (e.g., "stomach_pain", "high_fever").
 
 Input: "${userInput}"
 
 Output:`;
 
-  const response = await fetch('http://localhost:11434/v1/chat/completions', {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
     body: JSON.stringify({
-      model: 'mistral',
+      model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: 'You are a medical symptom extraction assistant. Always respond with ONLY a valid JSON array of symptom strings in snake_case English. No explanation, no markdown.' },
         { role: 'user', content: prompt },
       ],
-      stream: false,
       temperature: 0.1,
+      max_tokens: 256,
+      stream: false,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Ollama returned status ${response.status}`);
+    throw new Error(`Groq API returned status ${response.status}`);
   }
 
   const data = await response.json();
@@ -230,7 +240,7 @@ Output:`;
   // Extract JSON array from response (handle potential wrapping text)
   const jsonMatch = content.match(/\[[\s\S]*?\]/);
   if (!jsonMatch) {
-    console.warn('  ⚠️ Could not parse Ollama response:', content);
+    console.warn('  ⚠️ Could not parse Groq AI response:', content);
     return [];
   }
 

@@ -16,7 +16,7 @@ export default function EmergencyFAB() {
   return (
     <>
       <EmergencyModal open={open} onOpenChange={setOpen} />
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-50 hidden md:block">
         <Button
           onClick={() => setOpen(true)}
           className="rounded-full h-14 px-6 gap-3 text-white bg-red-600 hover:bg-red-700 shadow-xl shadow-red-500/30 animate-bounce hover:animate-none group transition-all"

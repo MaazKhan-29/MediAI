@@ -117,36 +117,38 @@ export default function AdminDoctors() {
             ) : (
               doctors.map(doc => (
                 <div key={doc._id} className="rounded-xl border border-border bg-card p-4 shadow-card">
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-full gradient-primary flex items-center justify-center text-lg font-bold text-primary-foreground">
-                        {doc.name?.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">{doc.name}</p>
-                        <p className="text-sm text-primary">{doc.doctorProfile?.specialization}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {doc.email} • {doc.doctorProfile?.experience}y exp • ₹{doc.doctorProfile?.fee}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{doc.doctorProfile?.qualification}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    {/* Avatar — fixed size */}
+                    <div className="h-12 w-12 shrink-0 rounded-full gradient-primary flex items-center justify-center text-lg font-bold text-primary-foreground">
+                      {doc.name?.charAt(0)}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColor[doc.doctorProfile?.isApproved] || ''}`}>
+
+                    {/* Info — grows but truncates */}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-foreground truncate">{doc.name}</p>
+                      <p className="text-sm text-primary truncate">{doc.doctorProfile?.specialization}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {doc.email} • {doc.doctorProfile?.experience}y exp • ₹{doc.doctorProfile?.fee}
+                      </p>
+                    </div>
+
+                    {/* Status + Actions — fixed to right, never wraps */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`rounded-full px-3 py-1 text-xs font-medium capitalize whitespace-nowrap ${statusColor[doc.doctorProfile?.isApproved] || ''}`}>
                         {doc.doctorProfile?.isApproved}
                       </span>
                       {doc.doctorProfile?.isApproved === 'pending' && (
                         <>
-                          <Button size="sm" onClick={() => handleApproval(doc._id, 'approved')} className="gradient-primary border-0 text-primary-foreground">
+                          <Button size="sm" onClick={() => handleApproval(doc._id, 'approved')} className="gradient-primary border-0 text-primary-foreground whitespace-nowrap">
                             <CheckCircle className="mr-1 h-3.5 w-3.5" /> Approve
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleApproval(doc._id, 'rejected')} className="text-destructive border-destructive/30">
+                          <Button size="sm" variant="outline" onClick={() => handleApproval(doc._id, 'rejected')} className="text-destructive border-destructive/30 whitespace-nowrap">
                             <XCircle className="mr-1 h-3.5 w-3.5" /> Reject
                           </Button>
                         </>
                       )}
                       {doc.doctorProfile?.isApproved === 'rejected' && (
-                        <Button size="sm" variant="outline" onClick={() => handleApproval(doc._id, 'approved')}>
+                        <Button size="sm" variant="outline" onClick={() => handleApproval(doc._id, 'approved')} className="whitespace-nowrap">
                           Re-Approve
                         </Button>
                       )}

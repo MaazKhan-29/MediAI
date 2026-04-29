@@ -340,7 +340,7 @@ export default function NearbyHospitals() {
 
           {/* Map + List */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-3 rounded-xl overflow-hidden border border-border shadow-card" style={{ height: "550px" }}>
+            <div className="lg:col-span-3 rounded-xl overflow-hidden border border-border shadow-card relative z-0" style={{ height: "550px" }}>
               <div ref={containerRef} style={{ height: "100%", width: "100%" }} />
             </div>
 

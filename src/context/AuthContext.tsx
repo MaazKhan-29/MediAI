@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '@/lib/api';
+import { auth, googleProvider } from '@/lib/firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 interface User {
   _id: string;
@@ -54,6 +56,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+  googleLogin: () => Promise<{ success: boolean; message: string }>;
   register: (data: any) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
@@ -107,6 +110,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const googleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseUser = result.user;
+      const idToken = await firebaseUser.getIdToken();
+
+      const { data } = await authAPI.googleLogin({
+        idToken,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || '',
+        picture: firebaseUser.photoURL || '',
+        googleId: firebaseUser.uid,
+      });
+
+      if (data.success) {
+        const { user: userData, token: authToken } = data.data;
+        setUser(userData);
+        setToken(authToken);
+        localStorage.setItem('mediai_token', authToken);
+        localStorage.setItem('mediai_user', JSON.stringify(userData));
+        return { success: true, message: data.message };
+      }
+      return { success: false, message: data.message || 'Google login failed' };
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      // Handle Firebase popup errors
+      if (error.code === 'auth/popup-closed-by-user') {
+        return { success: false, message: 'Google sign-in was cancelled.' };
+      }
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Google login failed. Please try again.',
+      };
+    }
+  };
+
   const register = async (formData: any) => {
     try {
       const { data } = await authAPI.register(formData);
@@ -147,6 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     token,
     loading,
     login,
+    googleLogin,
     register,
     logout,
     updateUser,

@@ -18,24 +18,15 @@ const seedDatabase = async () => {
     await connectDB();
     console.log('🗑️  Clearing existing data...');
 
-    await Patient.deleteMany({});
-    await Doctor.deleteMany({});
-    await Admin.deleteMany({});
-    await Appointment.deleteMany({});
-    await Review.deleteMany({});
-    await Payment.deleteMany({});
+    // await Patient.deleteMany({});
+    // await Doctor.deleteMany({});
+    // await Admin.deleteMany({});
+    // await Appointment.deleteMany({});
+    // await Review.deleteMany({});
+    // await Payment.deleteMany({});
 
     console.log('✅ Old data cleared.\n');
 
-    // ─── CREATE ADMIN ───
-    console.log('👤 Creating admin...');
-    const admin = await Admin.create({
-      name: 'Admin',
-      email: 'admin@mediai.com',
-      password: 'Admin@123',
-      phone: '9000000001',
-    });
-    console.log(`   ✅ Admin: ${admin.email}\n`);
 
     // ─── CREATE DOCTORS ───
     console.log('🩺 Creating doctors...\n');
@@ -370,18 +361,18 @@ const seedDatabase = async () => {
     console.log('\n══════════════════════════════════════════');
     console.log('  🎉 DATABASE SEEDED SUCCESSFULLY!');
     console.log('══════════════════════════════════════════');
-    console.log('\n📋 Summary:');
-    console.log(`   Admins:   1  (admin@mediai.com / Admin@123)`);
+    // console.log('\n📋 Summary:');
+    // console.log(`   Admins:   1  (admin@mediai.com / Admin@123)`);
     console.log(`   Doctors:  ${doctorData.length} (all pre-approved)`);
-    console.log(`   Patients: ${patientData.length}`);
-    console.log('\n🔑 Demo Credentials:');
-    console.log('   Patient: rahul@example.com / Patient@123');
-    console.log('   Doctor:  rajesh.sharma@mediai.com / Doctor@123');
-    console.log('   Admin:   admin@mediai.com / Admin@123');
-    console.log('\n📊 Collections:');
-    console.log('   patients → Patient collection');
-    console.log('   doctors  → Doctor collection');
-    console.log('   admins   → Admin collection\n');
+    // console.log(`   Patients: ${patientData.length}`);
+    // console.log('\n🔑 Demo Credentials:');
+    // console.log('   Patient: rahul@example.com / Patient@123');
+    // console.log('   Doctor:  rajesh.sharma@mediai.com / Doctor@123');
+    // console.log('   Admin:   admin@mediai.com / Admin@123');
+    // console.log('\n📊 Collections:');
+    // console.log('   patients → Patient collection');
+    // console.log('   doctors  → Doctor collection');
+    // console.log('   admins   → Admin collection\n');
 
     process.exit(0);
   } catch (error) {

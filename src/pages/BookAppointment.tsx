@@ -94,22 +94,22 @@ export default function BookAppointment() {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative text-center glass-card rounded-3xl p-10 max-w-md"
+          className="relative text-center glass-card rounded-3xl p-6 sm:p-10 w-full max-w-md"
         >
-          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 ring-4 ring-emerald-500/20">
-            <CheckCircle className="h-10 w-10 text-emerald-500" />
+          <div className="mx-auto mb-4 sm:mb-5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-emerald-500/10 ring-4 ring-emerald-500/20">
+            <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-500" />
           </div>
-          <h2 className="font-heading text-2xl font-bold text-foreground">Appointment Booked!</h2>
-          <p className="mt-3 text-muted-foreground leading-relaxed">
+          <h2 className="font-heading text-xl sm:text-2xl font-bold text-foreground">Appointment Booked!</h2>
+          <p className="mt-2 sm:mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
             Your appointment with <span className="font-semibold text-foreground">{doctor?.name}</span> on{" "}
             <span className="font-semibold text-foreground">{date}</span> at{" "}
             <span className="font-semibold text-foreground">{time}</span> is pending doctor confirmation.
           </p>
-          <div className="mt-8 flex gap-3 justify-center">
-            <Button onClick={() => navigate("/dashboard/patient/appointments")} className="gradient-primary border-0 text-primary-foreground btn-premium rounded-xl">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Button onClick={() => navigate("/dashboard/patient/appointments")} className="gradient-primary border-0 text-primary-foreground btn-premium rounded-xl text-sm">
               View My Appointments
             </Button>
-            <Button onClick={() => navigate("/")} variant="outline" className="rounded-xl glass border-border/50">
+            <Button onClick={() => navigate("/")} variant="outline" className="rounded-xl glass border-border/50 text-sm">
               Back to Home
             </Button>
           </div>

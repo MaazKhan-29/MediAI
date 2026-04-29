@@ -158,9 +158,11 @@ export default function PaymentGateway() {
                 <span className="font-bold text-lg text-green-600">₹{amount}</span>
               </div>
               {paymentData?.razorpayPaymentId && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Transaction ID</span>
-                  <span className="font-mono text-xs text-muted-foreground">{paymentData.razorpayPaymentId}</span>
+                <div className="border-t border-border pt-3">
+                  <span className="text-muted-foreground text-xs">Transaction ID</span>
+                  <p className="font-mono text-xs text-foreground mt-1 break-all select-all bg-card rounded-lg px-3 py-2 border border-border/50">
+                    {paymentData.razorpayPaymentId}
+                  </p>
                 </div>
               )}
             </div>

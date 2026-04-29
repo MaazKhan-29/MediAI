@@ -267,11 +267,11 @@ const recommendDoctors = async (req, res) => {
     const inputSymptoms = symptoms.map(s => s.toLowerCase().trim());
 
     // ── Step 1: LLM-based disease prediction ──
-    const { callOllamaPredict, getDoctorType } = require('./symptomController');
+    const { callGroqPredict, getDoctorType } = require('./symptomController');
 
-    console.log(`🔍 LLM Recommend for: [${inputSymptoms.join(', ')}]`);
+    console.log(`🔍 Groq LLM Recommend for: [${inputSymptoms.join(', ')}]`);
 
-    const llmPredictions = await callOllamaPredict(inputSymptoms);
+    const llmPredictions = await callGroqPredict(inputSymptoms);
 
     if (llmPredictions.length === 0) {
       return res.status(200).json({
@@ -343,11 +343,11 @@ const recommendDoctors = async (req, res) => {
   } catch (error) {
     console.error('Recommend doctors error:', error);
 
-    // If Ollama is unreachable
-    if (error.message && (error.message.includes('ECONNREFUSED') || error.message.includes('fetch failed'))) {
+    // If Groq API is unreachable
+    if (error.message && (error.message.includes('ECONNREFUSED') || error.message.includes('fetch failed') || error.message.includes('GROQ_API_KEY'))) {
       return res.status(503).json({
         success: false,
-        message: 'AI service is currently unavailable. Please ensure Ollama is running with the llama3.1 model.',
+        message: 'AI service is currently unavailable. Please try again later.',
       });
     }
 

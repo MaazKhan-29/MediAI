@@ -164,13 +164,25 @@ export default function ChatRoom() {
                   key={msg._id || i}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+                  className={`flex gap-1.5 ${isMe ? "flex-row-reverse" : ""}`}
                 >
+                  {/* Avatar */}
                   <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-sm ${
+                      isMe ? "gradient-primary" : "bg-muted border border-border/50"
+                    }`}
+                  >
+                    <span className={`text-xs font-bold ${isMe ? "text-primary-foreground" : "text-foreground"}`}>
+                      {isMe ? "You" : msg.senderModel?.charAt(0) || "D"}
+                    </span>
+                  </div>
+
+                  {/* Bubble */}
+                  <div
+                    className={`max-w-[75%] px-4 py-2.5 text-sm ${
                       isMe
-                        ? "gradient-primary text-primary-foreground rounded-br-md"
-                        : "bg-muted text-foreground rounded-bl-md"
+                        ? "gradient-primary text-primary-foreground rounded-2xl rounded-tr-none shadow-md"
+                        : "bg-muted/60 border border-border/30 text-foreground rounded-2xl rounded-tl-none"
                     }`}
                   >
                     <p>{msg.message}</p>
@@ -185,8 +197,11 @@ export default function ChatRoom() {
         )}
 
         {isTyping && (
-          <div className="flex justify-start">
-            <div className="bg-muted rounded-2xl px-4 py-3 rounded-bl-md">
+          <div className="flex gap-1.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-muted border border-border/50 shadow-sm">
+              <span className="text-xs font-bold text-foreground">D</span>
+            </div>
+            <div className="bg-muted/60 border border-border/30 rounded-2xl rounded-tl-none px-4 py-3">
               <div className="flex gap-1">
                 <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                 <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />

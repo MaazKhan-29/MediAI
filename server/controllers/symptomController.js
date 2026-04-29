@@ -1,7 +1,6 @@
 // Symptom Checker Controller
-// Uses Ollama LLM (llama3.1) to predict diseases from symptoms
-// Replaces the previous Jaccard similarity algorithm for more accurate,
-// context-aware, and clinically reasoned predictions.
+// Uses Groq API (LLaMA 3.3 70B) to predict diseases from symptoms
+// Cloud-based — no local Ollama dependency
 
 // Disease to doctor type mapping (kept for specialist routing)
 const diseaseToDoctorMapping = {
@@ -56,7 +55,7 @@ const diseaseToDoctorMapping = {
 };
 
 // ========================
-// OLLAMA LLM PREDICTION
+// GROQ API PREDICTION
 // ========================
 
 /**
@@ -132,34 +131,48 @@ const extractJSON = (text) => {
 };
 
 /**
- * Call Ollama LLM to predict diseases from symptoms
+ * Call Groq API to predict diseases from symptoms
+ * Uses LLaMA 3.3 70B model for accurate medical reasoning
  * @param {string[]} symptoms - Array of normalized symptom strings
  * @returns {Promise<Array>} - Array of prediction objects
  */
-const callOllamaPredict = async (symptoms) => {
+const callGroqPredict = async (symptoms) => {
   const prompt = buildPrompt(symptoms);
 
-  const response = await fetch('http://localhost:11434/api/generate', {
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  if (!GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY is not configured in environment variables');
+  }
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
     body: JSON.stringify({
-      model: 'llama3.1',
-      prompt,
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a medical assistant AI that provides structured disease predictions in JSON format. Always respond with ONLY valid JSON arrays. No markdown, no explanation.'
+        },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.3,       // Low temperature for consistent medical output
+      max_tokens: 512,         // Limit output length for speed
+      top_p: 1,
       stream: false,
-      options: {
-        temperature: 0.3,    // Low temperature for consistent medical output
-        num_predict: 512,    // Limit output length for speed
-      },
     }),
   });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Ollama returned status ${response.status}: ${errText}`);
+    throw new Error(`Groq API returned status ${response.status}: ${errText}`);
   }
 
   const data = await response.json();
-  const rawResponse = data.response || '';
+  const rawResponse = data.choices?.[0]?.message?.content || '';
 
   console.log('  🧠 LLM raw response:', rawResponse.substring(0, 300));
 
@@ -244,7 +257,7 @@ const getDoctorType = (disease) => {
 // API CONTROLLERS
 // ========================
 
-// @desc    Predict diseases from symptoms using LLM
+// @desc    Predict diseases from symptoms using Groq LLM
 // @route   POST /api/symptoms/predict
 // @access  Public
 const predictDisease = async (req, res) => {
@@ -268,10 +281,10 @@ const predictDisease = async (req, res) => {
 
     const inputSymptoms = symptoms.map(s => s.toLowerCase().trim());
 
-    console.log(`🔍 LLM Prediction for: [${inputSymptoms.join(', ')}]`);
+    console.log(`🔍 Groq LLM Prediction for: [${inputSymptoms.join(', ')}]`);
 
-    // Call Ollama LLM
-    const llmPredictions = await callOllamaPredict(inputSymptoms);
+    // Call Groq API
+    const llmPredictions = await callGroqPredict(inputSymptoms);
 
     if (llmPredictions.length === 0) {
       return res.status(200).json({
@@ -298,11 +311,19 @@ const predictDisease = async (req, res) => {
   } catch (error) {
     console.error('❌ LLM Prediction error:', error);
 
-    // If Ollama is not running or unreachable
+    // If Groq API key is missing
+    if (error.message && error.message.includes('GROQ_API_KEY')) {
+      return res.status(503).json({
+        success: false,
+        message: 'AI service is not configured. Please set the GROQ_API_KEY environment variable.',
+      });
+    }
+
+    // If Groq API is unreachable
     if (error.message && (error.message.includes('ECONNREFUSED') || error.message.includes('fetch failed'))) {
       return res.status(503).json({
         success: false,
-        message: 'AI service is currently unavailable. Please ensure Ollama is running with the llama3.1 model.',
+        message: 'AI service is currently unavailable. Please try again later.',
       });
     }
 
@@ -372,5 +393,5 @@ module.exports = {
   getSymptomsList,
   diseaseToDoctorMapping,
   getDoctorType,
-  callOllamaPredict,
+  callGroqPredict,
 };

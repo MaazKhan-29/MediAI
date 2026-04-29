@@ -96,20 +96,26 @@ export default function Doctors() {
                 />
               </div>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {["All", ...specializations.slice(0, 8)].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setFilter(s)}
-                  className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                    filter === s
-                      ? "gradient-primary text-primary-foreground shadow-md"
-                      : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="mt-4 relative">
+              {/* Fade edges */}
+              <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none rounded-l-xl" />
+              <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none rounded-r-xl" />
+              {/* Scrollable row */}
+              <div className="flex gap-2 overflow-x-auto pb-1 px-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {["All", ...specializations.slice(0, 8)].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setFilter(s)}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap shrink-0 transition-all duration-300 ${
+                      filter === s
+                        ? "gradient-primary text-primary-foreground shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

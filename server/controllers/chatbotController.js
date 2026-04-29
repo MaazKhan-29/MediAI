@@ -1,3 +1,7 @@
+// Chatbot Controller
+// Uses Mistral AI cloud API for conversational medical assistant
+// Cloud-based — no local Ollama dependency
+
 const systemPrompt = `You are MediAI, an intelligent medical assistant integrated into a doctor appointment system.
 
 Your role is to:
@@ -69,7 +73,7 @@ SPECIAL FEATURES:
 
 You are part of a healthcare system, so be safe, helpful, and structured.`;
 
-const chatWithOllama = async (req, res) => {
+const chatWithMistral = async (req, res) => {
   try {
     const { messages } = req.body;
 
@@ -77,35 +81,45 @@ const chatWithOllama = async (req, res) => {
       return res.status(400).json({ error: "Messages array is required." });
     }
 
+    const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+    if (!MISTRAL_API_KEY) {
+      return res.status(503).json({
+        error: "Chatbot service is not configured. Please set the MISTRAL_API_KEY environment variable.",
+      });
+    }
+
     const requestBody = {
-      model: "mistral",
+      model: "mistral-small-latest",
       messages: [
         { role: "system", content: systemPrompt },
         ...messages
       ],
       stream: true,
+      max_tokens: 1024,
+      temperature: 0.7,
     };
 
-    // Make local fetch request to Ollama's OpenAI compatible endpoint
-    const response = await fetch("http://localhost:11434/v1/chat/completions", {
+    // Make request to Mistral AI cloud API
+    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${MISTRAL_API_KEY}`,
       },
       body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("Local Ollama Error:", response.status, errText);
-      return res.status(500).json({ error: "Failed to communicate with local AI." });
+      console.error("Mistral AI API Error:", response.status, errText);
+      return res.status(500).json({ error: "Failed to communicate with AI chatbot service." });
     }
 
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    // Use native Web Streams available in Node 20
+    // Stream response from Mistral AI to client
     const body = response.body;
     for await (const chunk of body) {
       res.write(chunk);
@@ -113,11 +127,11 @@ const chatWithOllama = async (req, res) => {
     res.end();
 
   } catch (error) {
-    console.error("Chatbot Express proxy error:", error);
+    console.error("Chatbot error:", error);
     res.status(500).json({ error: "Internal Server Error related to Chatbot." });
   }
 };
 
 module.exports = {
-  chatWithOllama,
+  chatWithMistral,
 };

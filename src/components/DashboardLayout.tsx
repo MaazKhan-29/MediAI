@@ -1,9 +1,12 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useSocket } from '@/context/SocketContext';
+import { useTheme } from '@/context/ThemeContext';
 import {
   Activity, LayoutDashboard, Calendar, User, LogOut,
   Stethoscope, Clock, Star, Users, ShieldCheck, CreditCard,
-  Menu, X, FileText, ChevronRight,
+  Menu, X, FileText, ChevronRight, Brain, MessageCircle, MapPin, LifeBuoy,
+  Sun, Moon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,12 +36,16 @@ const adminNav: NavItem[] = [
   { to: '/dashboard/admin/doctors', label: 'Manage Doctors', icon: Stethoscope },
   { to: '/dashboard/admin/users', label: 'Manage Users', icon: Users },
   { to: '/dashboard/admin/appointments', label: 'Appointments', icon: Calendar },
+  { to: '/dashboard/admin/support', label: 'Support', icon: LifeBuoy },
 ];
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
+  const { isOnline } = useSocket();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const userIsOnline = user?._id ? isOnline(user._id) : false;
 
   const navItems = user?.role === 'admin' ? adminNav
     : user?.role === 'doctor' ? doctorNav
@@ -100,8 +107,8 @@ export default function DashboardLayout() {
               <div className="h-11 w-11 rounded-full gradient-primary flex items-center justify-center text-lg font-bold text-primary-foreground shadow-md">
                 {user?.name?.charAt(0)?.toUpperCase()}
               </div>
-              {/* Status dot */}
-              <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-card" />
+              {/* Status dot — dynamic online/offline */}
+              <div className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-card transition-colors duration-300 ${userIsOnline ? 'bg-emerald-500' : 'bg-gray-400'}`} />
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-foreground">{user?.name}</p>
@@ -146,33 +153,59 @@ export default function DashboardLayout() {
             })}
           </div>
 
-          {/* Quick links — only for patients */}
+          {/* Features — only for patients */}
           {user?.role === 'patient' && (
             <div className="mt-6 border-t border-border/40 pt-4">
               <p className="mb-2 px-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-                Quick Links
+                Features
               </p>
               {[
-                { to: '/symptom-checker', label: 'Symptom Checker', icon: Stethoscope },
-                { to: '/nearby-doctors', label: 'Find Hospitals', icon: Users },
+                { to: '/', label: 'Home', icon: Activity },
+                { to: '/symptom-checker', label: 'Symptom Checker', icon: Brain },
+                { to: '/doctors', label: 'Doctors', icon: Stethoscope },
+                { to: '/chatbot', label: 'AI Assistant', icon: MessageCircle },
                 { to: '/report-analyzer', label: 'Report Analyzer', icon: FileText },
-              ].map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-                >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </Link>
-              ))}
+                { to: '/nearby-doctors', label: 'Nearby Hospitals', icon: MapPin },
+                { to: '/support', label: 'Support', icon: LifeBuoy },
+              ].map((link) => {
+                const isActive = location.pathname === link.to;
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? 'text-primary bg-primary/8'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full gradient-primary"
+                      />
+                    )}
+                    <link.icon className={`h-4 w-4 transition-colors ${isActive ? 'text-primary' : ''}`} />
+                    {link.label}
+                    {isActive && (
+                      <ChevronRight className="ml-auto h-3.5 w-3.5 text-primary/50" />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </nav>
 
-        {/* Sign Out */}
-        <div className="border-t border-border/40 p-3 shrink-0">
+        {/* Theme Toggle + Sign Out */}
+        <div className="border-t border-border/40 p-3 shrink-0 space-y-1">
+          <button
+            onClick={toggleTheme}
+            className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
           <button
             onClick={() => { logout(); setSidebarOpen(false); }}
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/8 transition-all duration-200"
@@ -192,7 +225,9 @@ export default function DashboardLayout() {
           <span className="font-heading text-lg font-bold text-foreground tracking-tight">
             Medi<span className="gradient-text">AI</span>
           </span>
-          <div className="w-7" />
+          <button onClick={toggleTheme} className="text-muted-foreground hover:text-foreground transition-colors rounded-lg p-1">
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
         </div>
 
         {/* Page content */}

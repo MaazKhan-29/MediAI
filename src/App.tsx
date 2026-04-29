@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/context/AuthContext";
+import { SocketProvider } from "@/context/SocketContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -34,6 +35,7 @@ import AdminDashboard from "@/pages/dashboard/AdminDashboard";
 import AdminDoctors from "@/pages/dashboard/AdminDoctors";
 import AdminUsers from "@/pages/dashboard/AdminUsers";
 import AdminAppointments from "@/pages/dashboard/AdminAppointments";
+import AdminSupport from "@/pages/dashboard/AdminSupport";
 import NotFound from "@/pages/NotFound";
 
 import ScrollToTop from "@/components/ScrollToTop";
@@ -50,6 +52,7 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
+          <SocketProvider>
           <Navbar />
           <EmergencyFAB />
           <Routes>
@@ -112,10 +115,12 @@ const App = () => (
               <Route path="doctors" element={<AdminDoctors />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="appointments" element={<AdminAppointments />} />
+              <Route path="support" element={<AdminSupport />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

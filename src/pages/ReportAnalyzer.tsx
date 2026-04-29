@@ -68,7 +68,7 @@ export default function ReportAnalyzer() {
           fileName: file.name,
           fileSize: file.size,
           extractedText: error.response.data.extractedText,
-          analysis: "Analysis could not be completed. Please ensure Ollama is running.",
+          analysis: "Analysis could not be completed. Please try again later.",
         });
       }
     } finally {

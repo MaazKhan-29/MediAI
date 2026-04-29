@@ -74,32 +74,46 @@ const analyzeReport = async (req, res) => {
 
     console.log(`  ✅ OCR complete: ${extractedText.length} characters extracted`);
 
-    // ── Step 2: AI Analysis — Send to Ollama Mistral ──
-    const ollamaResponse = await fetch('http://localhost:11434/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'mistral',
-        messages: [
-          { role: 'system', content: reportAnalysisPrompt },
-          { role: 'user', content: extractedText.trim() },
-        ],
-        stream: false,
-      }),
-    });
-
-    if (!ollamaResponse.ok) {
-      const errText = await ollamaResponse.text();
-      console.error('Ollama error:', ollamaResponse.status, errText);
-      return res.status(500).json({
+    // ── Step 2: AI Analysis — Send to Groq API (LLaMA 3.3 70B) ──
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
+      return res.status(503).json({
         success: false,
-        message: 'AI analysis failed. Ensure Ollama is running with the Mistral model.',
+        message: 'AI service is not configured. Please set the GROQ_API_KEY environment variable.',
         extractedText: extractedText.trim(),
       });
     }
 
-    const ollamaData = await ollamaResponse.json();
-    const analysis = ollamaData.choices?.[0]?.message?.content || 'Analysis could not be generated.';
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: reportAnalysisPrompt },
+          { role: 'user', content: extractedText.trim() },
+        ],
+        temperature: 0.3,
+        max_tokens: 2048,
+        stream: false,
+      }),
+    });
+
+    if (!groqResponse.ok) {
+      const errText = await groqResponse.text();
+      console.error('Groq API error:', groqResponse.status, errText);
+      return res.status(500).json({
+        success: false,
+        message: 'AI analysis failed. Please try again later.',
+        extractedText: extractedText.trim(),
+      });
+    }
+
+    const groqData = await groqResponse.json();
+    const analysis = groqData.choices?.[0]?.message?.content || 'Analysis could not be generated.';
 
     console.log('  🧠 AI analysis complete');
 

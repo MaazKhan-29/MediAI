@@ -149,34 +149,58 @@ export default function AdminDashboard() {
             )}
           </motion.div>
 
-          {/* Appointment Status — Pie Chart */}
+          {/* Appointment Status — Donut Chart */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="rounded-xl border border-border bg-card p-6 shadow-card"
+            className="rounded-xl border border-border bg-card p-6 shadow-card flex flex-col"
           >
             <h3 className="font-heading font-bold text-foreground mb-4">Status Distribution</h3>
             {analytics.appointmentsByStatus.length > 0 ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie
-                    data={analytics.appointmentsByStatus}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {analytics.appointmentsByStatus.map((_: any, i: number) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={analytics.appointmentsByStatus}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={85}
+                      paddingAngle={3}
+                      dataKey="value"
+                      nameKey="name"
+                      stroke="none"
+                    >
+                      {analytics.appointmentsByStatus.map((_: any, i: number) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                      }}
+                      formatter={(value: number, name: string) => [`${value}`, name]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Custom Legend */}
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2">
+                  {analytics.appointmentsByStatus.map((entry: any, i: number) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <span
+                        className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                      />
+                      <span className="text-xs text-muted-foreground capitalize">{entry.name}</span>
+                      <span className="text-xs font-semibold text-foreground">{entry.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : (
               <p className="text-center text-muted-foreground py-12">No status data yet</p>
             )}

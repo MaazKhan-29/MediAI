@@ -373,3 +373,8 @@
   background: hsl(var(--primary) / 0.2);
   color: hsl(var(--foreground));
 }
+
+/* ═══ Hide Scrollbar ═══ */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

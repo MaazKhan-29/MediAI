@@ -20,6 +20,7 @@ const chatbotRoutes = require('./routes/chatbotRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const emergencyRoutes = require('./routes/emergencyRoutes');
+const supportRoutes = require('./routes/supportRoutes');
 
 // Import models for socket
 const Message = require('./models/Message');
@@ -86,6 +87,7 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/emergency', emergencyRoutes);
+app.use('/api/support', supportRoutes);
 
 // ========================
 // ERROR HANDLING
@@ -140,7 +142,9 @@ io.on('connection', (socket) => {
   // User joins with their userId
   socket.on('join', (userId) => {
     onlineUsers.set(userId, socket.id);
-    console.log(`  👤 User ${userId} is online`);
+    console.log(`  👤 User ${userId} is online (total: ${onlineUsers.size})`);
+    // Broadcast updated online users list to ALL clients
+    io.emit('online_users', Array.from(onlineUsers.keys()));
   });
 
   // Join a specific chat room
@@ -209,7 +213,9 @@ io.on('connection', (socket) => {
         break;
       }
     }
-    console.log(`🔌 Socket disconnected: ${socket.id}`);
+    // Broadcast updated online users list after removal
+    io.emit('online_users', Array.from(onlineUsers.keys()));
+    console.log(`🔌 Socket disconnected: ${socket.id} (online: ${onlineUsers.size})`);
   });
 });
 

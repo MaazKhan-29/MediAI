@@ -1,5 +1,6 @@
 // Home Remedies Controller
-// Uses Ollama (Mistral) to generate safe, natural home remedies
+// Uses Groq API (LLaMA 3.3 70B) to generate safe, natural home remedies
+// Cloud-based — no local Ollama dependency
 // ⚠️ NO medicine prescriptions, NO dosage — only safe lifestyle guidance
 
 // @desc    Get AI-powered home remedies for symptoms
@@ -19,6 +20,14 @@ const getHomeRemedies = async (req, res) => {
     const symptomList = symptoms.map(s => s.replace(/_/g, ' ')).join(', ');
 
     console.log(`🌿 Generating home remedies for: [${symptomList}]`);
+
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
+      return res.status(503).json({
+        success: false,
+        message: 'AI service is not configured. Please set the GROQ_API_KEY environment variable.',
+      });
+    }
 
     const systemPrompt = `You are a safe medical wellness assistant for a healthcare app called MediAI.
 
@@ -42,31 +51,35 @@ Respond in EXACTLY this JSON format (no markdown, no code blocks, just pure JSON
 
 Provide safe home remedies and guidance for these symptoms. Remember: NO medicines, NO dosage. Only natural/lifestyle remedies.`;
 
-    const ollamaResponse = await fetch('http://localhost:11434/v1/chat/completions', {
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+      },
       body: JSON.stringify({
-        model: 'mistral',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        stream: false,
         temperature: 0.3,
+        max_tokens: 1024,
+        stream: false,
       }),
     });
 
-    if (!ollamaResponse.ok) {
-      const errText = await ollamaResponse.text();
-      console.error('Ollama error:', ollamaResponse.status, errText);
+    if (!groqResponse.ok) {
+      const errText = await groqResponse.text();
+      console.error('Groq API error:', groqResponse.status, errText);
       return res.status(500).json({
         success: false,
-        message: 'AI service unavailable. Ensure Ollama is running with the Mistral model.',
+        message: 'AI service unavailable. Please try again later.',
       });
     }
 
-    const ollamaData = await ollamaResponse.json();
-    const content = ollamaData.choices?.[0]?.message?.content || '';
+    const groqData = await groqResponse.json();
+    const content = groqData.choices?.[0]?.message?.content || '';
 
     console.log('  🧠 AI response received, parsing...');
 

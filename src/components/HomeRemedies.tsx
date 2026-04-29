@@ -50,7 +50,7 @@ export default function HomeRemedies({ symptoms }: HomeRemediesProps) {
       if (e.code === "ECONNABORTED") {
         setError("AI service is taking too long. Please try again later.");
       } else {
-        setError("AI service unavailable. Make sure Ollama is running.");
+        setError("AI service unavailable. Please try again later.");
       }
     } finally {
       setLoading(false);

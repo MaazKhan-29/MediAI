@@ -136,7 +136,7 @@ export default function SymptomChecker() {
       setDoctors(results.recommendedDoctors || []);
     } catch (e: any) {
       console.error("Prediction error:", e);
-      const msg = e?.response?.data?.message || "Prediction failed. Please ensure Ollama is running.";
+      const msg = e?.response?.data?.message || "Prediction failed. Please try again later.";
       setErrorMsg(msg);
     } finally {
       setLoading(false);
@@ -155,23 +155,23 @@ export default function SymptomChecker() {
       {/* Background mesh */}
       <div className="absolute inset-0 gradient-mesh pointer-events-none" />
 
-      <div className="container relative mx-auto max-w-4xl px-4 py-8 md:py-12">
+      <div className="container relative mx-auto max-w-4xl px-4 py-6 md:py-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {/* ── Header ── */}
-          <div className="mb-10 text-center">
+          <div className="mb-8 md:mb-10 text-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="mx-auto mb-5 flex h-18 w-18 items-center justify-center rounded-2xl gradient-accent p-4 shadow-lg"
-              style={{ width: 72, height: 72 }}
+              className="mx-auto mb-4 md:mb-5 flex items-center justify-center rounded-2xl gradient-accent p-3 md:p-4 shadow-lg"
+              style={{ width: 60, height: 60 }}
             >
-              <Sparkles className="h-9 w-9 text-primary-foreground" />
+              <Sparkles className="h-7 w-7 md:h-9 md:w-9 text-primary-foreground" />
             </motion.div>
-            <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
+            <h1 className="font-heading text-2xl font-bold text-foreground md:text-4xl">
               AI Symptom <span className="gradient-text">Checker</span>
             </h1>
-            <p className="mx-auto mt-3 max-w-xl text-muted-foreground leading-relaxed">
+            <p className="mx-auto mt-2 md:mt-3 max-w-xl text-sm md:text-base text-muted-foreground leading-relaxed">
               Enter your symptoms in any language or use voice input — get AI-powered predictions with top doctor recommendations
             </p>
           </div>
@@ -182,25 +182,27 @@ export default function SymptomChecker() {
               variant={inputMode === "search" ? "default" : "outline"}
               size="sm"
               onClick={() => setInputMode("search")}
-              className={`rounded-xl transition-all duration-300 ${
+              className={`rounded-xl text-xs sm:text-sm transition-all duration-300 ${
                 inputMode === "search"
                   ? "gradient-primary border-0 text-primary-foreground shadow-lg"
                   : "glass border-border/50 hover:border-primary/30"
               }`}
             >
-              <Search className="h-4 w-4 mr-1.5" /> Search Symptoms
+              <Search className="h-4 w-4 mr-1 sm:mr-1.5" />
+              <span className="hidden sm:inline">Search </span>Symptoms
             </Button>
             <Button
               variant={inputMode === "multimodal" ? "default" : "outline"}
               size="sm"
               onClick={() => setInputMode("multimodal")}
-              className={`rounded-xl transition-all duration-300 ${
+              className={`rounded-xl text-xs sm:text-sm transition-all duration-300 ${
                 inputMode === "multimodal"
                   ? "gradient-primary border-0 text-primary-foreground shadow-lg"
                   : "glass border-border/50 hover:border-primary/30"
               }`}
             >
-              <Globe className="h-4 w-4 mr-1.5" /> Multilingual / Voice
+              <Globe className="h-4 w-4 mr-1 sm:mr-1.5" />
+              <span className="hidden sm:inline">Multilingual / </span>Voice
             </Button>
           </div>
 
@@ -264,8 +266,8 @@ export default function SymptomChecker() {
                   Type in Hindi, Hinglish, Marathi, or any language — or use the 🎤 mic button to speak
                 </p>
 
-                <div className="flex gap-3">
-                  <div className="relative flex-1 group">
+                <div className="space-y-3">
+                  <div className="relative group">
                     <Languages className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       className="h-12 pl-12 text-base rounded-xl border-border/40 bg-background/50 focus:border-primary/40 transition-all"
@@ -277,18 +279,20 @@ export default function SymptomChecker() {
                       }}
                     />
                   </div>
-                  <VoiceInput onTranscript={handleVoiceTranscript} disabled={normalizing} />
-                  <Button
-                    onClick={() => handleNormalize()}
-                    disabled={!input.trim() || normalizing}
-                    className="h-12 px-5 gradient-primary border-0 text-primary-foreground btn-premium rounded-xl"
-                  >
-                    {normalizing ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <ArrowRight className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <div className="flex gap-2">
+                    <VoiceInput onTranscript={handleVoiceTranscript} disabled={normalizing} />
+                    <Button
+                      onClick={() => handleNormalize()}
+                      disabled={!input.trim() || normalizing}
+                      className="flex-1 h-11 gradient-primary border-0 text-primary-foreground btn-premium rounded-xl text-sm"
+                    >
+                      {normalizing ? (
+                        <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Analyzing...</>
+                      ) : (
+                        <><ArrowRight className="h-4 w-4 mr-2" /> Analyze Symptoms</>
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* ── Raw Input & Normalized Output Display ── */}
@@ -485,54 +489,55 @@ export default function SymptomChecker() {
                           initial={{ opacity: 0, y: 15 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.12 }}
-                          className="group glass-card rounded-2xl p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-0.5"
+                          className="group glass-card rounded-2xl p-4 md:p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-0.5"
                         >
-                          <div className="flex items-center justify-between flex-wrap gap-4">
-                            <div className="flex items-center gap-4">
-                              {/* Rank Badge */}
-                              <div className={`flex h-11 w-11 items-center justify-center font-bold rounded-xl text-lg ${getRankBadge(i)}`}>
-                                #{i + 1}
+                          {/* Top: Rank + Avatar + Info */}
+                          <div className="flex items-start gap-3">
+                            {/* Rank Badge */}
+                            <div className={`flex h-9 w-9 md:h-11 md:w-11 shrink-0 items-center justify-center font-bold rounded-xl text-sm md:text-lg ${getRankBadge(i)}`}>
+                              #{i + 1}
+                            </div>
+                            {/* Avatar */}
+                            <div className="h-10 w-10 md:h-[52px] md:w-[52px] shrink-0 overflow-hidden rounded-full gradient-primary flex items-center justify-center text-lg md:text-xl font-bold text-primary-foreground shadow-lg">
+                              {doc.name.charAt(0)}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-heading text-base md:text-lg font-semibold text-foreground truncate">{doc.name}</h3>
+                              <p className="text-xs md:text-sm text-primary font-medium">{doc.specialization}</p>
+                              <div className="mt-1 md:mt-1.5 flex flex-wrap gap-2 md:gap-3 text-xs md:text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 text-yellow-500 fill-yellow-500" />
+                                  {doc.rating.toFixed(1)} ({doc.totalRatings})
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                                  {doc.experience} yrs
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <BadgeCheck className="h-3 w-3 md:h-3.5 md:w-3.5 text-emerald-500" />
+                                  Available
+                                </span>
                               </div>
-                              {/* Avatar */}
-                              <div className="h-13 w-13 shrink-0 overflow-hidden rounded-full gradient-primary flex items-center justify-center text-xl font-bold text-primary-foreground shadow-lg" style={{ width: 52, height: 52 }}>
-                                {doc.name.charAt(0)}
+                            </div>
+                          </div>
+
+                          {/* Bottom: AI Score + Fee + Book */}
+                          <div className="mt-3 pt-3 border-t border-border/30 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div>
+                                <div className="text-[10px] md:text-xs text-muted-foreground">AI Score</div>
+                                <div className="text-lg md:text-xl font-bold gradient-text">{(doc.score * 100).toFixed(0)}%</div>
                               </div>
                               <div>
-                                <h3 className="font-heading text-lg font-semibold text-foreground">{doc.name}</h3>
-                                <p className="text-sm text-primary font-medium">{doc.specialization}</p>
-                                <div className="mt-1.5 flex flex-wrap gap-3 text-sm text-muted-foreground">
-                                  <span className="flex items-center gap-1">
-                                    <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                                    {doc.rating.toFixed(1)} ({doc.totalRatings})
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="h-3.5 w-3.5" />
-                                    {doc.experience} yrs
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" />
-                                    Available
-                                  </span>
-                                </div>
+                                <div className="text-[10px] md:text-xs text-muted-foreground">Fee</div>
+                                <div className="text-lg md:text-xl font-bold text-foreground">₹{doc.fee}</div>
                               </div>
                             </div>
-
-                            <div className="flex items-center gap-5">
-                              {/* AI Score */}
-                              <div className="text-right">
-                                <div className="text-xs text-muted-foreground mb-0.5">AI Score</div>
-                                <div className="text-xl font-bold gradient-text">{(doc.score * 100).toFixed(0)}%</div>
-                              </div>
-                              {/* Fee + Book */}
-                              <div className="text-right">
-                                <p className="text-lg font-bold text-foreground">₹{doc.fee}</p>
-                                <Link to={`/book/${doc.id}`}>
-                                  <Button size="sm" className="mt-1.5 gradient-primary border-0 text-primary-foreground btn-premium rounded-xl shadow-md">
-                                    Book Now
-                                  </Button>
-                                </Link>
-                              </div>
-                            </div>
+                            <Link to={`/book/${doc.id}`}>
+                              <Button size="sm" className="gradient-primary border-0 text-primary-foreground btn-premium rounded-xl shadow-md text-xs md:text-sm">
+                                Book Now
+                              </Button>
+                            </Link>
                           </div>
                         </motion.div>
                       ))}

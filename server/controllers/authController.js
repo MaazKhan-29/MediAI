@@ -268,9 +268,140 @@ const changePassword = async (req, res) => {
   }
 };
 
+// @desc    Login/Register via Google (Firebase)
+// @route   POST /api/auth/google
+// @access  Public
+const googleLogin = async (req, res) => {
+  try {
+    const { idToken, email, name, picture, googleId } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required from Google authentication.',
+      });
+    }
+
+    const lowerEmail = email.toLowerCase().trim();
+
+    // ── Determine admin emails early ──
+    const adminEmails = (process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(e => e.length > 0);
+
+    const isAdminEmail = adminEmails.includes(lowerEmail);
+
+    let user = null;
+    let userRole = null;
+
+    // ── PRIORITY: If email is in ADMIN_EMAILS → always treat as admin ──
+    if (isAdminEmail) {
+      user = await Admin.findOne({ email: lowerEmail });
+      if (user) {
+        userRole = 'admin';
+      } else {
+        // Create Admin account on-the-fly
+        user = await Admin.create({
+          name: name || lowerEmail.split('@')[0],
+          email: lowerEmail,
+          googleId: googleId || null,
+          phone: '',
+        });
+        userRole = 'admin';
+      }
+    } else {
+      // ── Normal flow: check Patient → Doctor → Admin ──
+      // 1. Check Patient
+      user = await Patient.findOne({ email: lowerEmail });
+      if (user) userRole = 'patient';
+
+      // 2. Check Doctor
+      if (!user) {
+        user = await Doctor.findOne({ email: lowerEmail });
+        if (user) userRole = 'doctor';
+      }
+
+      // 3. Check Admin (fallback for non-ADMIN_EMAILS admins in DB)
+      if (!user) {
+        user = await Admin.findOne({ email: lowerEmail });
+        if (user) userRole = 'admin';
+      }
+    }
+
+    // ── If user exists → link Google ID if not already linked, then login ──
+    if (user) {
+      // Link Google ID if not already set
+      if (googleId && !user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+
+      // Update avatar from Google if user doesn't have one
+      if (picture && !user.avatar) {
+        user.avatar = picture;
+        await user.save();
+      }
+
+      // Check if doctor is approved
+      if (userRole === 'doctor') {
+        if (user.isApproved === 'pending') {
+          return res.status(403).json({
+            success: false,
+            message: 'Your doctor account is pending admin approval.',
+          });
+        }
+        if (user.isApproved === 'rejected') {
+          return res.status(403).json({
+            success: false,
+            message: 'Your doctor registration has been rejected by admin.',
+          });
+        }
+      }
+
+      const token = generateToken(user._id, userRole);
+      user.password = undefined;
+
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful.',
+        data: { user, token },
+      });
+    }
+
+    // ── User doesn't exist → create new Patient account ──
+    // (Admin emails are already handled above, so this only runs for non-admin emails)
+    user = await Patient.create({
+      name: name || lowerEmail.split('@')[0],
+      email: lowerEmail,
+      googleId: googleId || null,
+      avatar: picture || '',
+      phone: '',
+      gender: '',
+    });
+    userRole = 'patient';
+
+    const token = generateToken(user._id, userRole);
+    user.password = undefined;
+
+    res.status(201).json({
+      success: true,
+      message: 'Account created successfully via Google.',
+      data: { user, token },
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Google login failed.',
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  googleLogin,
   getProfile,
   updateProfile,
   changePassword,
