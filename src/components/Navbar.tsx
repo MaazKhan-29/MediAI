@@ -357,18 +357,16 @@ export default function Navbar() {
                   </>
                 )}
 
-                {/* Emergency Button */}
-                {showPatientNav && (
-                  <div className="mt-4 border-t border-border/40 pt-4">
-                    <button
-                      onClick={() => { setMobileOpen(false); setEmergencyOpen(true); }}
-                      className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-all duration-200 shadow-md"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                      🚨 Emergency
-                    </button>
-                  </div>
-                )}
+                {/* Emergency Button — always visible for all roles */}
+                <div className="mt-4 border-t border-border/40 pt-4">
+                  <button
+                    onClick={() => { setMobileOpen(false); setEmergencyOpen(true); }}
+                    className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-all duration-200 shadow-md"
+                  >
+                    <AlertTriangle className="h-4 w-4" />
+                    🚨 Emergency
+                  </button>
+                </div>
 
                 {/* Quick actions */}
                 <div className="mt-4 border-t border-border/40 pt-4">

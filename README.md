@@ -9,11 +9,18 @@
 </p>
 
 <p align="center">
+  <a href="https://medi-ai-maaz.vercel.app"><img src="https://img.shields.io/badge/🌐_Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" /></a>
+  <a href="https://mediai-backend-oa88.onrender.com/api/health"><img src="https://img.shields.io/badge/🔗_API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" /></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Live%20%E2%9C%85-brightgreen?style=flat-square" />
   <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js&logoColor=white" />
-  <img src="https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=flat-square&logo=mongodb&logoColor=white" />
-  <img src="https://img.shields.io/badge/AI-Ollama%20(Llama%203.1)-FF6F00?style=flat-square&logo=ai&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/AI-Groq%20%2B%20Mistral%20API-FF6F00?style=flat-square&logo=ai&logoColor=white" />
+  <img src="https://img.shields.io/badge/Auth-Firebase%20Google-FFCA28?style=flat-square&logo=firebase&logoColor=black" />
   <img src="https://img.shields.io/badge/Socket.io-Real--Time-010101?style=flat-square&logo=socket.io&logoColor=white" />
 </p>
 
@@ -21,20 +28,33 @@
 
 ## 📋 Table of Contents
 
+- [Live Demo](#-live-demo)
 - [Problem Statement](#-problem-statement)
 - [Our Solution](#-our-solution)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
+- [Deployment](#-deployment)
 - [Prerequisites](#-prerequisites)
 - [Installation & Setup](#-installation--setup)
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
 - [User Roles & Dashboards](#-user-roles--dashboards)
-- [Screenshots](#-screenshots)
 - [Contributing](#-contributing)
 - [License](#-license)
+
+---
+
+## 🌐 Live Demo
+
+| Service | URL | Status |
+|---------|-----|--------|
+| **Frontend** | [medi-ai-maaz.vercel.app](https://medi-ai-maaz.vercel.app) | ✅ Live |
+| **Backend API** | [mediai-backend-oa88.onrender.com](https://mediai-backend-oa88.onrender.com/api/health) | ✅ Live |
+| **Database** | MongoDB Atlas (Cloud) | ✅ Connected |
+
+> **Note:** The backend is hosted on Render's free tier. After 15 minutes of inactivity, the first request may take ~30-50 seconds (cold start).
 
 ---
 
@@ -53,17 +73,18 @@ Accessing reliable medical advice and finding the right specialist can be overwh
 
 ## 💡 Our Solution
 
-**MediAI** is a comprehensive, AI-powered healthcare platform that acts as a one-stop solution for patients seeking medical assistance. It leverages **locally-hosted AI models** (via Ollama) to provide secure, private, and intelligent healthcare guidance — from symptom analysis to doctor consultation.
+**MediAI** is a comprehensive, AI-powered healthcare platform that acts as a one-stop solution for patients seeking medical assistance. It leverages **cloud-based AI APIs** (Groq + Mistral) to provide fast, scalable, and intelligent healthcare guidance — from symptom analysis to doctor consultation.
 
 ### What Makes MediAI Different?
 
 | Feature | Traditional Apps | MediAI |
 |---------|-----------------|--------|
-| AI Processing | Cloud-based (privacy risk) | **Local AI via Ollama** (data stays on device) |
+| AI Processing | Slow / no AI | **Cloud AI via Groq (Llama 3.3) + Mistral API** |
 | Language Support | English only | **Hindi, Hinglish, Marathi + Voice Input** |
 | Report Analysis | Manual reading | **AI-powered OCR + Simplified Explanations** |
 | Doctor Matching | Manual search | **AI-driven specialist recommendation** |
 | Home Remedies | Generic tips | **Condition-specific natural remedies with safety warnings** |
+| Authentication | Email/Password only | **Firebase Google Sign-In + JWT** |
 
 ---
 
@@ -71,7 +92,7 @@ Accessing reliable medical advice and finding the right specialist can be overwh
 
 ### 🔍 1. Multimodal AI Symptom Checker
 - Input symptoms via **text or voice** in multiple languages (English, Hindi, Hinglish, Marathi)
-- AI analyzes symptoms using **Llama 3.1 LLM** running locally via Ollama
+- AI analyzes symptoms using **Llama 3.3 LLM** via Groq Cloud API
 - Returns **top 2 disease predictions** with confidence levels (low/medium/high) and **clinical reasoning**
 - LLM considers **symptom combinations** and avoids false positives (e.g., no Paralysis without numbness)
 - Minimum 2 symptoms required for reliable AI inference
@@ -81,7 +102,7 @@ Accessing reliable medical advice and finding the right specialist can be overwh
 - Get **safe, natural home remedies** for predicted conditions before your appointment
 - Remedies include ingredients, preparation methods, and dosage guidelines
 - **Crucial warning signs** highlighted — tells you when to stop self-care and seek urgent help
-- Powered by Llama 3.1 AI for context-aware, condition-specific suggestions
+- Powered by Groq AI (Llama 3.3) for context-aware, condition-specific suggestions
 
 ### 👨‍⚕️ 3. Smart Doctor Recommendations
 - AI recommends the **best-suited specialists** dynamically matching the disease without hardcoded limitations (See All)
@@ -127,7 +148,7 @@ Accessing reliable medical advice and finding the right specialist can be overwh
 - Refund tracking for cancelled appointments
 
 ### 🤖 9. AI Medical Chatbot
-- General-purpose **medical Q&A chatbot** powered by Ollama AI (Mistral)
+- General-purpose **medical Q&A chatbot** powered by Mistral AI API
 - Ask any health-related question and get instant AI responses
 - Maintains conversation context for follow-up questions
 - Includes appropriate medical disclaimers
@@ -146,7 +167,7 @@ Accessing reliable medical advice and finding the right specialist can be overwh
 - **Quick Support Actions**: "Call Support" and "Send Email" demo integrations for rapid assistance.
 
 ### 🔐 12. Role-Based Authentication & Dashboards
-- **JWT-based** secure authentication
+- **Firebase Google Sign-In** + **JWT-based** secure authentication
 - Three user roles: **Patient, Doctor, Admin**
 - Each role has a dedicated dashboard with relevant features
 - Protected routes with role-based access control
@@ -254,10 +275,18 @@ Accessing reliable medical advice and finding the right specialist can be overwh
 ### AI & NLP
 | Technology | Purpose |
 |-----------|---------|
-| **Ollama** | Local LLM hosting (no cloud dependency) |
-| **Llama 3.1** | Primary LLM for symptom-to-disease prediction with clinical reasoning |
-| **Mistral** | LLM for chatbot, report analysis, symptom normalization fallback & home remedies |
+| **Groq Cloud API** | Ultra-fast LLM inference platform |
+| **Llama 3.3 (via Groq)** | Primary LLM for symptom-to-disease prediction with clinical reasoning |
+| **Mistral AI API** | LLM for chatbot, report analysis, symptom normalization fallback & home remedies |
 | **Web Speech API** | Browser-native voice input |
+
+### Deployment & Infrastructure
+| Technology | Purpose |
+|-----------|---------|
+| **Vercel** | Frontend hosting (React + Vite) |
+| **Render** | Backend hosting (Node.js + Express) |
+| **MongoDB Atlas** | Cloud-hosted NoSQL database |
+| **Firebase** | Google OAuth authentication |
 
 ---
 
@@ -390,18 +419,36 @@ MediAI/
 
 ---
 
+## 🚀 Deployment
+
+MediAI is deployed using a split architecture:
+
+| Component | Platform | URL |
+|-----------|----------|-----|
+| **Frontend** | Vercel | [medi-ai-maaz.vercel.app](https://medi-ai-maaz.vercel.app) |
+| **Backend** | Render | [mediai-backend-oa88.onrender.com](https://mediai-backend-oa88.onrender.com/api/health) |
+| **Database** | MongoDB Atlas | Cloud cluster (`cluster0.gvls0ef.mongodb.net`) |
+| **Auth** | Firebase | Google Sign-In OAuth |
+| **AI (Symptoms)** | Groq API | Llama 3.3 70B model |
+| **AI (Chatbot)** | Mistral API | Mistral Large model |
+
+### Deployment Config Files
+- `vercel.json` — SPA rewrite rules for React Router
+- `server/package.json` — Build command includes DB seeding on first deploy
+- `.npmrc` — Handles peer dependency conflicts during Vercel builds
+
+---
+
 ## 📋 Prerequisites
 
-Before running MediAI locally, ensure you have the following installed:
+Before running MediAI **locally**, ensure you have the following installed:
 
 | Requirement | Version | Download Link |
 |------------|---------|---------------|
 | **Node.js** | v18+ | [nodejs.org](https://nodejs.org/) |
-| **MongoDB** | v6+ | [mongodb.com](https://www.mongodb.com/try/download/community) |
-| **Ollama** | Latest | [ollama.com](https://ollama.com/download) |
 | **Git** | Latest | [git-scm.com](https://git-scm.com/) |
 
-> **Note:** Ollama is required for all AI-powered features (Symptom Checker, Report Analyzer, Home Remedies, Chatbot). Without it, the app will still function but AI features will return errors.
+> **Note:** AI features use cloud APIs (Groq + Mistral) — no local AI setup needed. You'll need API keys from [console.groq.com](https://console.groq.com/keys) and [console.mistral.ai](https://console.mistral.ai/api-keys).
 
 ---
 
@@ -410,27 +457,12 @@ Before running MediAI locally, ensure you have the following installed:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/MediAI.git
+git clone https://github.com/MaazKhan-29/MediAI.git
 cd MediAI
 ```
 
-### Step 2: Pull the AI Models
 
-Open a terminal and download the required models via Ollama:
-
-```bash
-# Primary model — used for symptom-to-disease prediction (required)
-ollama pull llama3.1
-
-# Secondary model — used for chatbot, report analysis, home remedies (required)
-ollama pull mistral
-```
-
-> **Llama 3.1** (~4.7 GB) is used for intelligent disease prediction with clinical reasoning.
-> **Mistral** (~4.1 GB) is used for chatbot, report analysis, and symptom normalization fallback.
-> Wait for both downloads to complete before proceeding.
-
-### Step 3: Configure Environment Variables
+### Step 2: Configure Environment Variables
 
 **Backend** — Copy the example file and update values:
 
@@ -447,7 +479,7 @@ Edit `server/.env` with your credentials (see [Environment Variables](#-environm
 VITE_GOOGLE_MAPS_KEY=your_google_maps_api_key
 ```
 
-### Step 4: Install Dependencies
+### Step 3: Install Dependencies
 
 **Frontend (from project root):**
 
@@ -462,7 +494,7 @@ cd server
 npm install
 ```
 
-### Step 5: Seed the Database
+### Step 4: Seed the Database
 
 Populate the database with sample doctors and admin account:
 
@@ -473,23 +505,11 @@ npm run seed
 
 > This creates **15+ sample doctors** across specializations and a default **admin account**.
 
-### Step 6: Start All Services
+### Step 5: Start Services
 
-You need **3 terminals** running simultaneously:
+You need **2 terminals** running simultaneously:
 
-**Terminal 1 — MongoDB** (skip if using MongoDB as a service):
-```bash
-mongod
-```
-
-**Terminal 2 — Ollama AI Server:**
-```bash
-ollama serve
-```
-
-> If Ollama is already running in the background, you can skip this step.
-
-**Terminal 3 — Backend Server:**
+**Terminal 1 — Backend Server:**
 ```bash
 cd server
 npm run dev
@@ -497,7 +517,7 @@ npm run dev
 
 > ✅ Backend runs on `http://localhost:5000`
 
-**Terminal 4 — Frontend Dev Server:**
+**Terminal 2 — Frontend Dev Server:**
 ```bash
 # From project root
 npm run dev
@@ -505,7 +525,7 @@ npm run dev
 
 > ✅ Frontend runs on `http://localhost:8080`
 
-### Step 7: Open the Application
+### Step 6: Open the Application
 
 Navigate to **http://localhost:8080** in your browser. 🎉
 
@@ -517,18 +537,20 @@ Navigate to **http://localhost:8080** in your browser. 🎉
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017/mediai` |
+| `MONGO_URI` | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/mediai` |
 | `JWT_SECRET` | Secret key for JWT tokens | `your_strong_random_secret_key` |
 | `PORT` | Backend server port | `5000` |
+| `GROQ_API_KEY` | Groq API key for Llama 3.3 | `gsk_xxxxx` |
+| `MISTRAL_API_KEY` | Mistral API key for chatbot | `your_mistral_key` |
 | `RAZORPAY_KEY_ID` | Razorpay API Key ID | `rzp_test_xxxxx` |
 | `RAZORPAY_KEY_SECRET` | Razorpay API Secret | `your_razorpay_secret` |
 | `EMAIL_HOST` | SMTP email host | `smtp.gmail.com` |
 | `EMAIL_PORT` | SMTP email port | `587` |
 | `EMAIL_USER` | Email address for notifications | `your_email@gmail.com` |
 | `EMAIL_PASS` | Email app password | `your_app_password` |
-| `CLIENT_URL` | Frontend URL for CORS | `http://localhost:8080` |
-| `ADMIN_EMAIL` | Default admin email | `admin@mediai.com` |
-| `ADMIN_PASSWORD` | Default admin password | `Admin@123` |
+| `CLIENT_URL` | Frontend URL for CORS | `https://your-app.vercel.app` |
+| `ADMIN_EMAILS` | Admin emails (comma-separated) | `admin@example.com` |
+| `NODE_ENV` | Environment mode | `production` |
 
 ### Frontend (`.env` at project root)
 
@@ -564,13 +586,13 @@ Navigate to **http://localhost:8080** in your browser. 🎉
 ### AI Services
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/symptoms/predict` | LLM-powered symptom → disease prediction (Llama 3.1) |
+| `POST` | `/api/symptoms/predict` | LLM-powered symptom → disease prediction (Groq/Llama 3.3) |
 | `GET`  | `/api/symptoms/list` | Get all available symptoms for autocomplete |
 | `POST` | `/api/symptoms/normalize` | Multilingual symptom normalization |
 | `POST` | `/api/doctors/recommend` | Predict diseases + recommend ranked doctors |
-| `POST` | `/api/ai/analyze-report` | AI medical report analysis (Mistral) |
-| `POST` | `/api/chatbot/message` | AI chatbot conversation (Mistral) |
-| `POST` | `/api/ai/home-remedies` | AI home remedy suggestions (Mistral) |
+| `POST` | `/api/ai/analyze-report` | AI medical report analysis (Groq) |
+| `POST` | `/api/chatbot/message` | AI chatbot conversation (Mistral API) |
+| `POST` | `/api/ai/home-remedies` | AI home remedy suggestions (Groq) |
 
 ### Payments
 | Method | Endpoint | Description |
@@ -664,14 +686,14 @@ npm run test:watch
 | Issue | Solution |
 |-------|----------|
 | `Port 5000 already in use` | Run `taskkill /F /IM node.exe` (Windows) or `kill -9 $(lsof -ti :5000)` (Mac/Linux) |
-| Ollama not responding | Ensure Ollama is running: `ollama serve` in a separate terminal |
-| MongoDB connection failed | Verify MongoDB is running: `mongod --dbpath /data/db` |
-| Symptom prediction fails | Confirm Llama 3.1 model is pulled: `ollama list` should show `llama3.1` |
-| Chatbot/Report AI errors | Confirm Mistral model is pulled: `ollama list` should show `mistral` |
-| "AI service unavailable" | Ollama is not running — start it with `ollama serve` |
+| Backend slow first load | Render free tier cold start — wait ~30-50s, subsequent requests are fast |
+| MongoDB connection failed | Check `MONGO_URI` in env — ensure MongoDB Atlas IP whitelist includes `0.0.0.0/0` |
+| Symptom prediction fails | Verify `GROQ_API_KEY` is valid at [console.groq.com](https://console.groq.com) |
+| Chatbot errors | Verify `MISTRAL_API_KEY` is valid at [console.mistral.ai](https://console.mistral.ai) |
+| Google Sign-In fails | Add your domain to Firebase Console → Authentication → Authorized Domains |
 | Prediction needs 2+ symptoms | This is by design — select at least 2 symptoms for accurate LLM prediction |
 | Frontend can't reach backend | Check CORS — ensure `CLIENT_URL` in `server/.env` matches frontend URL |
-| `npm install` fails | Try `npm install --legacy-peer-deps` for the frontend |
+| `npm install` fails | Try `npm install --legacy-peer-deps` or check `.npmrc` has `legacy-peer-deps=true` |
 | Report upload fails | Ensure `server/uploads/` directory exists with write permissions |
 
 ---
